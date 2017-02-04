@@ -27,30 +27,32 @@ public class OkHttpRequest {
 
     //MOVIE DB FUNCTIONALITY
     static final private String DISCOVER = "discover";
+    static final private String POPULAR = "popular";
+    static final private String TOP_RATED = "top_rated";
 
     //IMAGE
     static final private String IMAGE_SIZE="w185";
 
     //QUERY TYPE
-    static final private String SORT_OPERATION = "sort_by";
-    static final private String SORT_TYPE_POPULARITY_DESC = "popularity.desc";
-    static final private String SORT_TYPE_VOTE_DESC = "vote_average.desc";
 
-    static final private String COUNTRY_OPERATION="certification_country";
-    static final private String COUNTRY_IT="IT";
+    static final private String LANGUAGE="language";
+    static final private String LANGUAGE_EN_US="en-US";
+    static final private String PAGE="en-US";
+
 
     static final private String API_KEY = "api_key";
 
-     //REQUEST EXAMPLE /discover/movie?sort_by=popularity.desc
+     //REQUEST EXAMPLE https://api.themoviedb.org/3/movie/popular?api_key=<<api_key>>&language=en-US&page=1
      public static Request buildPopularRequest(){
          HttpUrl url = new HttpUrl.Builder()
                  .scheme(SCHEMA_HTTPS)
                  .host(BASE_URL)
                  .addPathSegment(API_VERSION)
-                 .addPathSegment(DISCOVER)
                  .addPathSegment(MOVIE)
+                 .addPathSegment(POPULAR)
                  .addQueryParameter(API_KEY, BuildConfig.MOVIE_DB_API_KEY)
-                 .addQueryParameter(SORT_OPERATION,SORT_TYPE_POPULARITY_DESC)
+                 .addQueryParameter(LANGUAGE,LANGUAGE_EN_US)
+                 .addQueryParameter(PAGE,String.valueOf(1))
                  .build();
 
          Log.d("CLIENT_URL_POPULARITY",url.toString());
@@ -61,17 +63,17 @@ public class OkHttpRequest {
 
 
 
-    //REQUEST EXAMPLE /discover/movie/?certification_country=US&certification=R&sort_by=vote_average.desc
+    //REQUEST EXAMPLE https://api.themoviedb.org/3/movie/top_rated?api_key=<<api_key>>&language=en-US&page=1
     public static Request buildTopRatedRequest(){
         HttpUrl url = new HttpUrl.Builder()
                 .scheme(SCHEMA_HTTPS)
                 .host(BASE_URL)
                 .addPathSegment(API_VERSION)
-                .addPathSegment(DISCOVER)
                 .addPathSegment(MOVIE)
+                .addPathSegment(TOP_RATED)
                 .addQueryParameter(API_KEY, BuildConfig.MOVIE_DB_API_KEY)
-                .addQueryParameter(COUNTRY_OPERATION,COUNTRY_IT)
-                .addQueryParameter(SORT_OPERATION,SORT_TYPE_VOTE_DESC)
+                .addQueryParameter(LANGUAGE,LANGUAGE_EN_US)
+                .addQueryParameter(PAGE,String.valueOf(1))
                 .build();
 
         Log.d("CLIENT_URL_VOTE",url.toString());

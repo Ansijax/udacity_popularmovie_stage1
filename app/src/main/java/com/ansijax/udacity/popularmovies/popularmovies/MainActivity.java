@@ -40,8 +40,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     ProgressBar mLoadingProgressBar;
     TextView mDisplayError;
 
-    static private final int POPULAR=0;
-    static private final int TOP_RATED=1;
+
+    static private final int POPULAR = 0;
+    static private final String BUNDLE = "bundle";
+    static private final int TOP_RATED = 1;
 
     int mQueryType = POPULAR;
 
@@ -51,10 +53,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         setContentView(R.layout.activity_main);
         httpClient = new OkHttpClient();
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_posters);
-        mLoadingProgressBar=(ProgressBar) findViewById(R.id.pb_loading);
-        mDisplayError=(TextView) findViewById(R.id.tv_error_message);
+        mLoadingProgressBar = (ProgressBar) findViewById(R.id.pb_loading);
+        mDisplayError = (TextView) findViewById(R.id.tv_error_message);
 
-        mLayoutManager = new GridLayoutManager(this,2,GridLayoutManager.VERTICAL,false);
+        mLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
@@ -63,13 +65,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     }
 
 
-    public void callNetwork(){
-        Request request=null;
-        if (mQueryType==POPULAR){
+    public void callNetwork() {
+        Request request = null;
+        if (mQueryType == POPULAR) {
 
             request = OkHttpRequest.buildPopularRequest();
 
-        }else if(mQueryType==TOP_RATED){
+        } else if (mQueryType == TOP_RATED) {
 
             request = OkHttpRequest.buildTopRatedRequest();
         }
@@ -81,30 +83,30 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater= getMenuInflater();
-        inflater.inflate(R.menu.main_menu,menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        int idItem= item.getItemId();
-        switch(idItem){
+        int idItem = item.getItemId();
+        switch (idItem) {
             case R.id.menu_popular:
-                mQueryType=POPULAR;
+                mQueryType = POPULAR;
                 break;
             case R.id.menu_rating:
-                mQueryType=TOP_RATED;
+                mQueryType = TOP_RATED;
                 break;
         }
         mAdapter.setAdapter(null);
-        Log.d("item_selected",""+mQueryType);
+        Log.d("item_selected", "" + mQueryType);
         callNetwork();
         return super.onOptionsItemSelected(item);
     }
 
-    public String getMovies(Request request){
+    public String getMovies(Request request) {
 
         final Gson gson = new Gson();
         mHandler = new Handler(Looper.getMainLooper());
@@ -114,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
             @Override
             public void onFailure(Call call, IOException e) {
-
 
 
                 mHandler.post(new Runnable() {
@@ -128,25 +129,18 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                    if(response.isSuccessful()){
-
-                        movies = gson.fromJson(response.body().charStream(), MovieList.class);
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                prepareSucessLayout();
-                                mAdapter.setAdapter(movies);
-
-                            }
-                        });
-
-
-                    }else {
-
-                        prepareErrorLayout(getResources().getString(R.string.error_failure));
-
-                    }
+                if (response.isSuccessful()) {
+                    movies = gson.fromJson(response.body().charStream(), MovieList.class);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            prepareSucessLayout();
+                            mAdapter.setAdapter(movies);
+                        }
+                    });
+                } else {
+                    prepareErrorLayout(getResources().getString(R.string.error_failure));
+                }
 
             }
         });
@@ -156,13 +150,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     }
 
 
-    public void prepareSucessLayout(){
+    public void prepareSucessLayout() {
         mRecyclerView.setVisibility(View.VISIBLE);
         mLoadingProgressBar.setVisibility(View.INVISIBLE);
         mDisplayError.setVisibility(View.INVISIBLE);
 
     }
-    public void prepareErrorLayout(String text){
+
+    public void prepareErrorLayout(String text) {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingProgressBar.setVisibility(View.INVISIBLE);
         mDisplayError.setVisibility(View.VISIBLE);
@@ -171,8 +166,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     @Override
     public void onClick(Movie movie) {
-        Intent intent = new Intent(MainActivity.this,MovieDetail.class);
-        intent.putExtra("test",movie);
+        Intent intent = new Intent(MainActivity.this, MovieDetail.class);
+        intent.putExtra(BUNDLE, movie);
         startActivity(intent);
     }
 }

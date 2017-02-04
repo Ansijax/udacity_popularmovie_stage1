@@ -11,13 +11,14 @@ import com.ansijax.udacity.popularmovies.popularmovies.pojo.Movie;
 import com.squareup.picasso.Picasso;
 
 public class MovieDetail extends AppCompatActivity {
+    static private final String BUNDLE="bundle";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
         Intent intent=getIntent();
-        Movie movie=(Movie) intent.getParcelableExtra("test");
+        Movie movie=(Movie) intent.getParcelableExtra(BUNDLE);
         setInformation(movie);
     }
 
