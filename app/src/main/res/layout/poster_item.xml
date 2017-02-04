@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:horizontalSpacing="0dp"
+    android:verticalSpacing="0dp"
+
+    tools:context=".MainActivity">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+    <ImageView
+        android:id="@+id/iv_movie_poster"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/placeholder"
+        />
+
+        <!-- work around for this android bug http://stackoverflow.com/questions/33779634/how-to-fix-text-overflowing-textview-with-padding-androidellipsize-marquee -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:layout_gravity="bottom"
+            android:background="@color/darkOpaque"
+            >
+        <TextView
+            android:id="@+id/tv_grid_movie_name"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:fontFamily="monospace"
+            android:lines="1"
+            android:textAlignment="center"
+            android:textSize="19sp"
+            android:scrollHorizontally="true"
+            android:textColor="@android:color/white"
+
+            />
+
+        </LinearLayout>
+    </FrameLayout>
+</GridLayout>

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="menu_popular">Popular</string>
+    <string name="menu_top_rated">Rate</string>
+    <string name="synopsis">Synopsis</string>
+    <string name="release">Release date</string>
+    <string name="rate">Rate</string>
+    <string name="error_connection">Sorry! Network problem!</string>
+    <string name="error_failure">Seems there are some problems! \n Please try again later!</string>
+</resources>
