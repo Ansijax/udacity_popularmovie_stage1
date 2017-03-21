@@ -1,6 +1,8 @@
 package com.ansijax.udacity.popularmovies.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,6 +17,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.ansijax.udacity.popularmovies.popularmovies.data.MovieColumns;
+import com.ansijax.udacity.popularmovies.popularmovies.data.MoviesProvider;
 import com.ansijax.udacity.popularmovies.popularmovies.network.OkHttpRequest;
 import com.ansijax.udacity.popularmovies.popularmovies.pojo.Movie;
 import com.ansijax.udacity.popularmovies.popularmovies.pojo.MovieList;
@@ -60,6 +64,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
+        ContentValues cv = new ContentValues();
+        cv.put(MovieColumns.TITLE,"prova");
+        cv.put(MovieColumns.MOVIE_ID,"2323");
+        this.getContentResolver().insert(MoviesProvider.FavoriteMovies.MOVIES,cv);
 
         callNetwork();
     }
@@ -99,11 +107,26 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
             case R.id.menu_rating:
                 mQueryType = TOP_RATED;
                 break;
+            case R.id.menu_favorite:
+                //TODO remove this test;
+                testfunction();
         }
         mAdapter.setAdapter(null);
         Log.d("item_selected", "" + mQueryType);
         callNetwork();
         return super.onOptionsItemSelected(item);
+    }
+
+    public void testfunction(){
+        Cursor cursor= this.getContentResolver().query(MoviesProvider.FavoriteMovies.MOVIES,
+                null,
+                null,
+                null,
+                null);
+
+        while (cursor.moveToNext()){
+            Log.d("debug Content",cursor.getString(cursor.getColumnIndex(MovieColumns.TITLE)));
+        }
     }
 
     public String getMovies(Request request) {

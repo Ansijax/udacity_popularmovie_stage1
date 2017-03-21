@@ -30,6 +30,11 @@
                 android:value=".MainActivity" />
 
         </activity>
+
+        <provider
+            android:authorities="com.ansijax.udacity.popularmovies.popularmovies.MoviesProvider"
+            android:name="com.ansijax.udacity.popularmovies.popularmovies.provider.MoviesProvider"
+            android:exported="false" />
     </application>
 
 </manifest>
