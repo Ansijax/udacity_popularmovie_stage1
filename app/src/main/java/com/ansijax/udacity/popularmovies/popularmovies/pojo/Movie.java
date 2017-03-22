@@ -59,6 +59,13 @@ public class Movie implements Parcelable{
     @Expose
     private Double voteAverage;
 
+    private byte[] imageBinary;
+
+    public byte[] getImageBinary(){return imageBinary;}
+
+    public void setImageBinary(byte[] imageBinary){ this.imageBinary=imageBinary;}
+
+
     public String getPosterPath() {
         return posterPath;
     }
@@ -196,6 +203,8 @@ public class Movie implements Parcelable{
 
 
     }
+
+    public Movie(){}
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {

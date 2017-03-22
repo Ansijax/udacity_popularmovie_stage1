@@ -1,6 +1,8 @@
 package com.ansijax.udacity.popularmovies.popularmovies;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -42,7 +44,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieListV
     @Override
     public void onBindViewHolder(MovieListViewHolder holder, int position) {
         //Picasso.with(holder.mContext).setIndicatorsEnabled(true); //check image caching
-        String posterPath=mMovieList.getMovies().get(position).getPosterPath();
+
         holder.mTitleTextView.setText(mMovieList.getMovies().get(position).getTitle());
         //needed to set via code, cause via xml only one item get the marquee effect
         holder.mTitleTextView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
@@ -51,11 +53,18 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieListV
         holder.mTitleTextView.requestFocus();
 
 
-        String imagePath=null;
-        if (posterPath!=null) {
-             imagePath= OkHttpRequest.buildImageUrl(posterPath);
+        if(mMovieList.getMovies().get(position).getPosterPath()!=null) {
+            String posterPath = mMovieList.getMovies().get(position).getPosterPath();
+            String imagePath = null;
+            if (posterPath != null) {
+                imagePath = OkHttpRequest.buildImageUrl(posterPath);
+            }
+            Picasso.with(holder.mContext).load(imagePath).error(R.drawable.placeholder).placeholder(R.drawable.placeholder).into(holder.mImageView);
+        }else {
+            byte[] imageBinary=mMovieList.getMovies().get(position).getImageBinary();
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBinary, 0, imageBinary.length);
+            holder.mImageView.setImageBitmap(bitmap);
         }
-        Picasso.with(holder.mContext).load(imagePath).error(R.drawable.placeholder).placeholder(R.drawable.placeholder).into(holder.mImageView);
     }
 
     public interface MoviesAdapterOnClick{

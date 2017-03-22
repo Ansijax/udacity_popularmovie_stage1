@@ -29,6 +29,8 @@ public class OkHttpRequest {
     static final private String DISCOVER = "discover";
     static final private String POPULAR = "popular";
     static final private String TOP_RATED = "top_rated";
+    static final private String REVIEWS = "reviews";
+    static final private String VIDEOS = "videos";
 
     //IMAGE
     static final private String IMAGE_SIZE="w185";
@@ -97,5 +99,60 @@ public class OkHttpRequest {
 
         return url.toString();
 
+    }
+
+
+    public static Request buildMovieUrl(int id){
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SCHEMA_HTTP)
+                .host(BASE_URL)
+                .addPathSegment(API_VERSION)
+                .addPathSegment(MOVIE)
+                .addPathSegment(String.valueOf(id))
+                .addQueryParameter(API_KEY, BuildConfig.MOVIE_DB_API_KEY)
+                .build();
+
+        Log.d("CLIENT_URL_MOVIE",url.toString());
+
+        return  new Request.Builder()
+                .url(url)
+                .build();
+    }
+
+
+    public static Request buildReviewUrl(int id){
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SCHEMA_HTTP)
+                .host(BASE_URL)
+                .addPathSegment(API_VERSION)
+                .addPathSegment(MOVIE)
+                .addPathSegment(String.valueOf(id))
+                .addPathSegment(REVIEWS)
+                .addQueryParameter(API_KEY, BuildConfig.MOVIE_DB_API_KEY)
+                .build();
+
+        Log.d("CLIENT_URL_REVIEW",url.toString());
+
+        return  new Request.Builder()
+                .url(url)
+                .build();
+    }
+
+    public static Request buildVideosUrl(int id){
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SCHEMA_HTTP)
+                .host(BASE_URL)
+                .addPathSegment(API_VERSION)
+                .addPathSegment(MOVIE)
+                .addPathSegment(String.valueOf(id))
+                .addPathSegment(REVIEWS)
+                .addQueryParameter(API_KEY, BuildConfig.MOVIE_DB_API_KEY)
+                .build();
+
+        Log.d("CLIENT_URL_VIDEOS",url.toString());
+
+        return  new Request.Builder()
+                .url(url)
+                .build();
     }
 }

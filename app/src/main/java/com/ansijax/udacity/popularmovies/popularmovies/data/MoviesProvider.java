@@ -31,7 +31,7 @@ public final class MoviesProvider {
                 path = FavoriteMoviesDatabase.MOVIE + "/#",
                 name = "LIST_ID",
                 type = "vnd.android.cursor.item/list",
-                whereColumn = MovieColumns._ID,
+                whereColumn = MovieColumns.MOVIE_ID,
                 pathSegment = 1)
         public static Uri withId(long id) {
             return Uri.parse("content://" + AUTHORITY + "/movie/" + id);

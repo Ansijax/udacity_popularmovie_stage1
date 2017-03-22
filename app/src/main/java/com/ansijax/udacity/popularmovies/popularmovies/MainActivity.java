@@ -1,6 +1,5 @@
 package com.ansijax.udacity.popularmovies.popularmovies;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -25,6 +24,7 @@ import com.ansijax.udacity.popularmovies.popularmovies.pojo.MovieList;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -43,11 +43,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     MovieList movies;
     ProgressBar mLoadingProgressBar;
     TextView mDisplayError;
-
+    boolean fromFavvorite;
 
     static private final int POPULAR = 0;
     static private final String BUNDLE = "bundle";
+    static private final String FAVORITE_MOVIE = "favorite_move";
     static private final int TOP_RATED = 1;
+    static private final int FAVORITE = 2;
+
 
     int mQueryType = POPULAR;
 
@@ -64,10 +67,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
-        ContentValues cv = new ContentValues();
-        cv.put(MovieColumns.TITLE,"prova");
-        cv.put(MovieColumns.MOVIE_ID,"2323");
-        this.getContentResolver().insert(MoviesProvider.FavoriteMovies.MOVIES,cv);
 
         callNetwork();
     }
@@ -108,26 +107,43 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                 mQueryType = TOP_RATED;
                 break;
             case R.id.menu_favorite:
-                //TODO remove this test;
-                testfunction();
+                mQueryType = FAVORITE;
+                break;
+
+
         }
         mAdapter.setAdapter(null);
         Log.d("item_selected", "" + mQueryType);
-        callNetwork();
+        if(mQueryType==FAVORITE)
+            retriveFromfavorite();
+        else
+            callNetwork();
         return super.onOptionsItemSelected(item);
     }
 
-    public void testfunction(){
+    public void retriveFromfavorite(){
         Cursor cursor= this.getContentResolver().query(MoviesProvider.FavoriteMovies.MOVIES,
                 null,
                 null,
                 null,
                 null);
 
+        //MovieList storedMovireList = new MovieList();
+        ArrayList<Movie> storedMovieList = new ArrayList<Movie>();
         while (cursor.moveToNext()){
-            Log.d("debug Content",cursor.getString(cursor.getColumnIndex(MovieColumns.TITLE)));
+            Movie movie = new Movie();
+            movie.setImageBinary(cursor.getBlob(cursor.getColumnIndex(MovieColumns.MOVIE_IMG)));
+            movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieColumns.TITLE)));
+            movie.setId(cursor.getInt(cursor.getColumnIndex(MovieColumns.MOVIE_ID)));
+            storedMovieList.add(movie);
+
         }
+        MovieList movieList = new MovieList();
+        movieList.setMovies(storedMovieList);
+        mAdapter.setAdapter(movieList);
+        cursor.close();
     }
+
 
     public String getMovies(Request request) {
 
@@ -172,6 +188,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mQueryType==FAVORITE){
+            retriveFromfavorite();
+        }
+    }
 
     public void prepareSucessLayout() {
         mRecyclerView.setVisibility(View.VISIBLE);
@@ -190,7 +213,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public void onClick(Movie movie) {
         Intent intent = new Intent(MainActivity.this, MovieDetail.class);
-        intent.putExtra(BUNDLE, movie);
+        if(mQueryType==FAVORITE)
+            intent.putExtra(FAVORITE_MOVIE,movie.getId());
+        else
+            intent.putExtra(BUNDLE, movie);
         startActivity(intent);
     }
 }
