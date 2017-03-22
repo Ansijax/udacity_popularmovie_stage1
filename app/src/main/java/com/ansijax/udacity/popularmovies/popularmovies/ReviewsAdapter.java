@@ -19,7 +19,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewsL
 
     @Override
     public ReviewsListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view =  LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item, parent, false);
         ReviewsListViewHolder holder = new ReviewsListViewHolder(view);
         return holder;
 
@@ -34,10 +34,9 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewsL
     }
 
 
-
     @Override
     public int getItemCount() {
-        if(mReviews==null)
+        if (mReviews == null)
             return 0;
         else
             return mReviews.getResults().size();
@@ -56,15 +55,14 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewsL
             mTvAuthor = (TextView) itemView.findViewById(R.id.tv_author);
 
 
-
         }
 
 
     }
 
 
-    public void setAdapter(Reviews reviews){
-        mReviews=reviews;
+    public void setAdapter(Reviews reviews) {
+        mReviews = reviews;
         notifyDataSetChanged();
     }
 }

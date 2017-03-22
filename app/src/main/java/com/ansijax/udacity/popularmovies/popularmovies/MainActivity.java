@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,7 +36,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 
-public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClick {
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClick, LoaderManager.LoaderCallbacks<Cursor> {
 
     RecyclerView mRecyclerView;
     Handler mHandler;
@@ -43,13 +46,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     MovieList movies;
     ProgressBar mLoadingProgressBar;
     TextView mDisplayError;
-    boolean fromFavvorite;
+    boolean fromFavorite;
 
     static private final int POPULAR = 0;
     static private final String BUNDLE = "bundle";
     static private final String FAVORITE_MOVIE = "favorite_move";
     static private final int TOP_RATED = 1;
     static private final int FAVORITE = 2;
+    static private final int ID_LOADER = 99;
 
 
     int mQueryType = POPULAR;
@@ -114,34 +118,16 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         }
         mAdapter.setAdapter(null);
         Log.d("item_selected", "" + mQueryType);
-        if(mQueryType==FAVORITE)
-            retriveFromfavorite();
+        if (mQueryType == FAVORITE)
+            retrieveFromFavorite();
         else
             callNetwork();
         return super.onOptionsItemSelected(item);
     }
 
-    public void retriveFromfavorite(){
-        Cursor cursor= this.getContentResolver().query(MoviesProvider.FavoriteMovies.MOVIES,
-                null,
-                null,
-                null,
-                null);
+    public void retrieveFromFavorite() {
 
-        //MovieList storedMovireList = new MovieList();
-        ArrayList<Movie> storedMovieList = new ArrayList<Movie>();
-        while (cursor.moveToNext()){
-            Movie movie = new Movie();
-            movie.setImageBinary(cursor.getBlob(cursor.getColumnIndex(MovieColumns.MOVIE_IMG)));
-            movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieColumns.TITLE)));
-            movie.setId(cursor.getInt(cursor.getColumnIndex(MovieColumns.MOVIE_ID)));
-            storedMovieList.add(movie);
-
-        }
-        MovieList movieList = new MovieList();
-        movieList.setMovies(storedMovieList);
-        mAdapter.setAdapter(movieList);
-        cursor.close();
+        getSupportLoaderManager().restartLoader(ID_LOADER, null, this);
     }
 
 
@@ -191,8 +177,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     protected void onResume() {
         super.onResume();
-        if(mQueryType==FAVORITE){
-            retriveFromfavorite();
+        if (mQueryType == FAVORITE) {
+            retrieveFromFavorite();
         }
     }
 
@@ -213,10 +199,43 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public void onClick(Movie movie) {
         Intent intent = new Intent(MainActivity.this, MovieDetail.class);
-        if(mQueryType==FAVORITE)
-            intent.putExtra(FAVORITE_MOVIE,movie.getId());
+        if (mQueryType == FAVORITE)
+            intent.putExtra(FAVORITE_MOVIE, movie.getId());
         else
             intent.putExtra(BUNDLE, movie);
         startActivity(intent);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        return new CursorLoader(this,
+                MoviesProvider.FavoriteMovies.MOVIES,
+                null,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        ArrayList<Movie> storedMovieList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Movie movie = new Movie();
+            movie.setImageBinary(cursor.getBlob(cursor.getColumnIndex(MovieColumns.MOVIE_IMG)));
+            movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieColumns.TITLE)));
+            movie.setId(cursor.getInt(cursor.getColumnIndex(MovieColumns.MOVIE_ID)));
+            storedMovieList.add(movie);
+
+        }
+        MovieList movieList = new MovieList();
+        movieList.setMovies(storedMovieList);
+        mAdapter.setAdapter(movieList);
+        cursor.close();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.setAdapter(null);
     }
 }

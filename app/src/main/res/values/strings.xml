@@ -12,4 +12,6 @@
     <string name="label_videos">Videos</string>
     <string name="movies_added">Great! this movie was added to your favorite</string>
     <string name="movies_removed">This moview was removed from your favorite</string>
+    <string name="no_review">We are sorry, there are no review at this moment!</string>
+    <string name="no_video">We are sorry, there are no video at this moment!</string>
 </resources>

@@ -20,14 +20,14 @@ import com.squareup.picasso.Picasso;
  * Created by massimo on 02/02/17.
  */
 
-public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieListViewHolder>{
+public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieListViewHolder> {
 
     MovieList mMovieList;
     MoviesAdapterOnClick mClickHandler;
 
-    public MoviesAdapter(MoviesAdapterOnClick clickHandler){
-        //TODO controllare se è giusta questa cosa
-        mClickHandler=clickHandler;
+    public MoviesAdapter(MoviesAdapterOnClick clickHandler) {
+
+        mClickHandler = clickHandler;
 
     }
 
@@ -36,7 +36,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieListV
     public MovieListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
 
-        View view =  LayoutInflater.from(parent.getContext()).inflate(R.layout.poster_item,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.poster_item, parent, false);
         MovieListViewHolder holder = new MovieListViewHolder(view);
         return holder;
     }
@@ -53,65 +53,64 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieListV
         holder.mTitleTextView.requestFocus();
 
 
-        if(mMovieList.getMovies().get(position).getPosterPath()!=null) {
+        if (mMovieList.getMovies().get(position).getPosterPath() != null) {
             String posterPath = mMovieList.getMovies().get(position).getPosterPath();
             String imagePath = null;
             if (posterPath != null) {
                 imagePath = OkHttpRequest.buildImageUrl(posterPath);
             }
             Picasso.with(holder.mContext).load(imagePath).error(R.drawable.placeholder).placeholder(R.drawable.placeholder).into(holder.mImageView);
-        }else {
-            byte[] imageBinary=mMovieList.getMovies().get(position).getImageBinary();
+        } else {
+            byte[] imageBinary = mMovieList.getMovies().get(position).getImageBinary();
             Bitmap bitmap = BitmapFactory.decodeByteArray(imageBinary, 0, imageBinary.length);
             holder.mImageView.setImageBitmap(bitmap);
         }
     }
 
-    public interface MoviesAdapterOnClick{
-           void onClick(Movie movie);
+    public interface MoviesAdapterOnClick {
+        void onClick(Movie movie);
     }
 
 
     @Override
     public int getItemCount() {
-        if(mMovieList==null) {
+        if (mMovieList == null) {
 
-            return 0 ;
-        }
-        else {
+            return 0;
+        } else {
 
             return mMovieList.getMovies().size();
         }
     }
 
 
-    public class MovieListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class MovieListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public ImageView mImageView;
         public Context mContext;
         public TextView mTitleTextView;
 
 
-        public MovieListViewHolder(View view){
+        public MovieListViewHolder(View view) {
 
             super(view);
-            mImageView=(ImageView) view.findViewById(R.id.iv_movie_poster);
+            mImageView = (ImageView) view.findViewById(R.id.iv_movie_poster);
             mContext = view.getContext();
-            mTitleTextView =(TextView) view.findViewById(R.id.tv_grid_movie_name);
+            mTitleTextView = (TextView) view.findViewById(R.id.tv_grid_movie_name);
             view.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             int adapterPostion = getAdapterPosition();
-            Movie clickedMovie=mMovieList.getMovies().get(adapterPostion);
+            Movie clickedMovie = mMovieList.getMovies().get(adapterPostion);
             mClickHandler.onClick(clickedMovie);
         }
     }
 
-    public void setAdapter(MovieList movieList){
+    public void setAdapter(MovieList movieList) {
 
-        mMovieList=movieList;
+        mMovieList = movieList;
 
         notifyDataSetChanged();
     }

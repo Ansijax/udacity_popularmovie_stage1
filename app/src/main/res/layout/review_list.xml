@@ -28,7 +28,17 @@
 
 
         </android.support.v7.widget.RecyclerView>
+        <TextView
+            android:id="@+id/tv_no_review"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:fontFamily="monospace"
+            android:text="@string/no_review"
+            android:textAlignment="center"
+            android:visibility="gone"/>
     </LinearLayout>
+
     <ProgressBar
         android:id="@+id/pb_review_loading"
         android:layout_gravity="center"
