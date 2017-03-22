@@ -145,7 +145,7 @@ public class OkHttpRequest {
                 .addPathSegment(API_VERSION)
                 .addPathSegment(MOVIE)
                 .addPathSegment(String.valueOf(id))
-                .addPathSegment(REVIEWS)
+                .addPathSegment(VIDEOS)
                 .addQueryParameter(API_KEY, BuildConfig.MOVIE_DB_API_KEY)
                 .build();
 

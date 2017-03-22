@@ -8,6 +8,8 @@
     <string name="rate">Rate</string>
     <string name="error_connection">Sorry! Network problem!</string>
     <string name="error_failure">Seems there are some problems! \n Please try again later!</string>
+    <string name="label_review">Users reviews</string>
+    <string name="label_videos">Videos</string>
     <string name="movies_added">Great! this movie was added to your favorite</string>
     <string name="movies_removed">This moview was removed from your favorite</string>
 </resources>

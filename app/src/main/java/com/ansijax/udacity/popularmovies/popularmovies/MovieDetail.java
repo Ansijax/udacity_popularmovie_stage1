@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ import com.ansijax.udacity.popularmovies.popularmovies.data.MoviesProvider;
 import com.ansijax.udacity.popularmovies.popularmovies.network.OkHttpRequest;
 import com.ansijax.udacity.popularmovies.popularmovies.pojo.Movie;
 import com.ansijax.udacity.popularmovies.popularmovies.pojo.Reviews;
+import com.ansijax.udacity.popularmovies.popularmovies.pojo.Videos;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -34,27 +36,42 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MovieDetail extends AppCompatActivity {
+public class MovieDetail extends AppCompatActivity implements VideosAdapter.VideosAdapterOnClick{
     static private final String BUNDLE="bundle";
     static private final String FAVORITE_MOVIE = "favorite_move";
     Movie _movie;
     ReviewsAdapter mReviewsAdapter;
+    VideosAdapter mVideosAdapter;
     RecyclerView mReviewsRecycleView;
+    RecyclerView mVideosRecycleView;
     ImageView displayPoster;
     Boolean isFavorite;
-    RecyclerView.LayoutManager mLayoutManager;
+    RecyclerView.LayoutManager mReviewLayoutManager;
+    RecyclerView.LayoutManager mVideosLayoutManager;
     OkHttpClient httpClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
         Intent intent=getIntent();
-        mReviewsAdapter= new ReviewsAdapter();
         httpClient = new OkHttpClient();
+
+        mReviewsAdapter= new ReviewsAdapter();
+        mVideosAdapter = new VideosAdapter(this);
+
         mReviewsRecycleView= (RecyclerView) findViewById(R.id.rv_reviews);
-        mLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        mReviewsRecycleView.setLayoutManager(mLayoutManager);
+        mReviewLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        mReviewsRecycleView.setLayoutManager(mReviewLayoutManager);
         mReviewsRecycleView.setAdapter(mReviewsAdapter);
+        RecyclerView.ItemDecoration itemDecoration = new
+                DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
+        mReviewsRecycleView.addItemDecoration(itemDecoration);
+
+
+        mVideosRecycleView=(RecyclerView) findViewById(R.id.rv_videos);
+        mVideosLayoutManager= new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        mVideosRecycleView.setLayoutManager(mVideosLayoutManager);
+        mVideosRecycleView.setAdapter(mVideosAdapter);
 
         if(intent.hasExtra(BUNDLE)){
 
@@ -175,6 +192,7 @@ public class MovieDetail extends AppCompatActivity {
         if(isFavorite)
             getMovie(OkHttpRequest.buildMovieUrl(id));
         getReviews(OkHttpRequest.buildReviewUrl(id));
+        getVideos(OkHttpRequest.buildVideosUrl(id));
 
     }
 
@@ -182,7 +200,8 @@ public class MovieDetail extends AppCompatActivity {
 
         final Gson gson = new Gson();
         final Handler mHandler = new Handler(Looper.getMainLooper());
-
+        final ProgressBar mLoadingProgressBar =(ProgressBar) findViewById(R.id.pb_movie_info);
+        mLoadingProgressBar.setVisibility(View.VISIBLE);
         httpClient.newCall(request).enqueue(new Callback() {
 
 
@@ -193,9 +212,9 @@ public class MovieDetail extends AppCompatActivity {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        //TODO insert here the progress bar
+
                     //    prepareErrorLayout(getResources().getString(R.string.error_connection));
-                    //    mLoadingProgressBar.setVisibility(View.INVISIBLE);
+                        mLoadingProgressBar.setVisibility(View.INVISIBLE);
                     }
                 });
             }
@@ -208,7 +227,7 @@ public class MovieDetail extends AppCompatActivity {
                         @Override
                         public void run() {
                           //  prepareSucessLayout();
-                            // mAdapter.setAdapter(movies);
+                            mLoadingProgressBar.setVisibility(View.INVISIBLE);
                             setInformation(_movie);
                         }
                     });
@@ -228,7 +247,8 @@ public class MovieDetail extends AppCompatActivity {
 
         final Gson gson = new Gson();
         final Handler mHandler = new Handler(Looper.getMainLooper());
-
+        final ProgressBar mLoadingProgressBar =(ProgressBar) findViewById(R.id.pb_review_loading);
+        mLoadingProgressBar.setVisibility(View.VISIBLE);
         httpClient.newCall(request).enqueue(new Callback() {
 
 
@@ -239,20 +259,22 @@ public class MovieDetail extends AppCompatActivity {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        //TODO insert here the progress bar
+
                         //    prepareErrorLayout(getResources().getString(R.string.error_connection));
-                        //    mLoadingProgressBar.setVisibility(View.INVISIBLE);
+                            mLoadingProgressBar.setVisibility(View.INVISIBLE);
                     }
                 });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+
                 if (response.isSuccessful()) {
                     final Reviews reviews = gson.fromJson(response.body().charStream(), Reviews.class);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            mLoadingProgressBar.setVisibility(View.INVISIBLE);
                             //  prepareSucessLayout();
                             // mAdapter.setAdapter(movies);
                             mReviewsAdapter.setAdapter(reviews);
@@ -269,4 +291,57 @@ public class MovieDetail extends AppCompatActivity {
 
     }
 
+
+    public String getVideos(Request request) {
+        final ProgressBar mLoadingProgressBar =(ProgressBar) findViewById(R.id.pb_video_loading);
+
+        final Gson gson = new Gson();
+        final Handler mHandler = new Handler(Looper.getMainLooper());
+        mLoadingProgressBar.setVisibility(View.VISIBLE);
+        httpClient.newCall(request).enqueue(new Callback() {
+
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //TODO insert here the progress bar
+                        //    prepareErrorLayout(getResources().getString(R.string.error_connection));
+                            mLoadingProgressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                if (response.isSuccessful()) {
+                    final Videos videos = gson.fromJson(response.body().charStream(), Videos.class);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            //  prepareSucessLayout();
+                            // mAdapter.setAdapter(movies);
+                            mLoadingProgressBar.setVisibility(View.INVISIBLE);
+                            mVideosAdapter.setAdapter(videos);
+                        }
+                    });
+                } else {
+                    //prepareErrorLayout(getResources().getString(R.string.error_failure));
+                }
+
+            }
+        });
+
+        return null;
+
+    }
+
+    @Override
+    public void onClick(Movie movie) {
+
+    }
 }

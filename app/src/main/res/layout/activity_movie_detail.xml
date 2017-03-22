@@ -142,7 +142,9 @@
 
                 android:textSize="14sp"
                 android:fontFamily="monospace" />
-        <include layout="@layout/review_list" />
+
+            <include layout="@layout/video_list"/>
+            <include layout="@layout/review_list" />
         </LinearLayout>
 
     </ScrollView>

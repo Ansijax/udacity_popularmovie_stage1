@@ -2,6 +2,8 @@ package com.ansijax.udacity.popularmovies.popularmovies;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -25,7 +27,9 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViedoListV
 
     @Override
     public ViedoListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.video_item,parent,false);
+        ViedoListViewHolder holder = new ViedoListViewHolder(view);
+        return holder;
     }
 
     @Override
@@ -33,7 +37,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViedoListV
 
         holder.mVideoTitle.setText(mVideos.getResults().get(position).getName());
         String imagePath=composeYoutubeThumbnail(mVideos.getResults().get(position).getKey());
-        Picasso.with(holder.mContext).load(imagePath).error(R.drawable.placeholder).placeholder(R.drawable.placeholder).into(holder.mVideoThumbnail);
+        Picasso.with(holder.mContext).load(imagePath).error(R.drawable.video_place_holder).placeholder(R.drawable.video_place_holder).into(holder.mVideoThumbnail);
     }
 
     @Override
@@ -73,8 +77,10 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViedoListV
 
     private String composeYoutubeThumbnail(String key){
         String baseYouTubeUrl="https://img.youtube.com/vi/";
-        String imgType="/default.jpg";
-        return baseYouTubeUrl+key+imgType;
+        String imgType="/hqdefault.jpg";
+        String path=baseYouTubeUrl+key+imgType;
+        Log.d("ADAPTER_YOUTUBE_THUMB",path);
+        return path;
 
     }
 
