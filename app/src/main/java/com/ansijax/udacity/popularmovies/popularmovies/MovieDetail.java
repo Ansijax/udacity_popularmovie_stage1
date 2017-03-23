@@ -19,9 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.ansijax.udacity.popularmovies.popularmovies.data.MovieContract;
-import com.ansijax.udacity.popularmovies.popularmovies.data.MoviesProvider;
 import com.ansijax.udacity.popularmovies.popularmovies.network.OkHttpRequest;
 import com.ansijax.udacity.popularmovies.popularmovies.pojo.Movie;
 import com.ansijax.udacity.popularmovies.popularmovies.pojo.Reviews;
@@ -49,6 +47,8 @@ public class MovieDetail extends AppCompatActivity implements VideosAdapter.Vide
     RecyclerView mVideosRecycleView;
     ImageView displayPoster;
     Boolean isFavorite;
+    Videos mVideos;
+    Reviews mReviews;
     RecyclerView.LayoutManager mReviewLayoutManager;
     RecyclerView.LayoutManager mVideosLayoutManager;
     OkHttpClient httpClient;
@@ -82,18 +82,19 @@ public class MovieDetail extends AppCompatActivity implements VideosAdapter.Vide
         mVideosLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mVideosRecycleView.setLayoutManager(mVideosLayoutManager);
         mVideosRecycleView.setAdapter(mVideosAdapter);
+        if(savedInstanceState==null){
+            if (intent.hasExtra(BUNDLE)) {
 
-        if (intent.hasExtra(BUNDLE)) {
+                _movie = (Movie) intent.getParcelableExtra(BUNDLE);
+                setInformation(_movie);
+                callNetwork(_movie.getId(), false);
 
-            _movie = (Movie) intent.getParcelableExtra(BUNDLE);
-            setInformation(_movie);
-            callNetwork(_movie.getId(), false);
+            } else {
 
-        } else {
+                int id = intent.getIntExtra(FAVORITE_MOVIE, -1);
+                callNetwork(id, true);
 
-            int id = intent.getIntExtra(FAVORITE_MOVIE, -1);
-            callNetwork(id, true);
-
+            }
         }
 
 
@@ -273,16 +274,16 @@ public class MovieDetail extends AppCompatActivity implements VideosAdapter.Vide
             public void onResponse(Call call, Response response) throws IOException {
 
                 if (response.isSuccessful()) {
-                    final Reviews reviews = gson.fromJson(response.body().charStream(), Reviews.class);
+                    mReviews = gson.fromJson(response.body().charStream(), Reviews.class);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             mLoadingProgressBar.setVisibility(View.INVISIBLE);
 
-                            if (reviews.getResults().isEmpty())
+                            if (mReviews.getResults().isEmpty())
                                 mTvNoReview.setVisibility(View.VISIBLE);
                             else
-                                mReviewsAdapter.setAdapter(reviews);
+                                mReviewsAdapter.setAdapter(mReviews);
                         }
                     });
                 } else {
@@ -325,17 +326,17 @@ public class MovieDetail extends AppCompatActivity implements VideosAdapter.Vide
             public void onResponse(Call call, Response response) throws IOException {
 
                 if (response.isSuccessful()) {
-                    final Videos videos = gson.fromJson(response.body().charStream(), Videos.class);
+                    mVideos = gson.fromJson(response.body().charStream(), Videos.class);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             //  prepareSucessLayout();
                             // mAdapter.setAdapter(movies);
                             mLoadingProgressBar.setVisibility(View.INVISIBLE);
-                            if (videos.getResults().isEmpty())
+                            if (mVideos.getResults().isEmpty())
                                 mTvNoVideo.setVisibility(View.VISIBLE);
                             else
-                                mVideosAdapter.setAdapter(videos);
+                                mVideosAdapter.setAdapter(mVideos);
                         }
                     });
                 } else {
@@ -347,6 +348,28 @@ public class MovieDetail extends AppCompatActivity implements VideosAdapter.Vide
         });
 
         return null;
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("movie",_movie);
+        outState.putParcelable("videos",mVideos);
+        outState.putParcelable("reviews",mReviews);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        _movie=savedInstanceState.getParcelable("movie");
+        mVideos=savedInstanceState.getParcelable("videos");
+        mReviews=savedInstanceState.getParcelable("reviews");
+
+        mReviewsAdapter.setAdapter(mReviews);
+        mVideosAdapter.setAdapter(mVideos);
+        setInformation(_movie);
 
     }
 

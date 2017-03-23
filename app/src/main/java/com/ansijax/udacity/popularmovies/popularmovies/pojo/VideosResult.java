@@ -1,10 +1,12 @@
-
 package com.ansijax.udacity.popularmovies.popularmovies.pojo;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class VideosResult {
+public class VideosResult implements Parcelable {
 
     @SerializedName("id")
     @Expose
@@ -95,4 +97,50 @@ public class VideosResult {
         this.type = type;
     }
 
+
+    protected VideosResult(Parcel in) {
+        id = in.readString();
+        iso6391 = in.readString();
+        iso31661 = in.readString();
+        key = in.readString();
+        name = in.readString();
+        site = in.readString();
+        size = in.readByte() == 0x00 ? null : in.readInt();
+        type = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(iso6391);
+        dest.writeString(iso31661);
+        dest.writeString(key);
+        dest.writeString(name);
+        dest.writeString(site);
+        if (size == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(size);
+        }
+        dest.writeString(type);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<VideosResult> CREATOR = new Parcelable.Creator<VideosResult>() {
+        @Override
+        public VideosResult createFromParcel(Parcel in) {
+            return new VideosResult(in);
+        }
+
+        @Override
+        public VideosResult[] newArray(int size) {
+            return new VideosResult[size];
+        }
+    };
 }
