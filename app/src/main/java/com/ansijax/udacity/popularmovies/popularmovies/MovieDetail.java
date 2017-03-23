@@ -19,7 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ansijax.udacity.popularmovies.popularmovies.data.MovieColumns;
+
+import com.ansijax.udacity.popularmovies.popularmovies.data.MovieContract;
 import com.ansijax.udacity.popularmovies.popularmovies.data.MoviesProvider;
 import com.ansijax.udacity.popularmovies.popularmovies.network.OkHttpRequest;
 import com.ansijax.udacity.popularmovies.popularmovies.pojo.Movie;
@@ -124,7 +125,7 @@ public class MovieDetail extends AppCompatActivity implements VideosAdapter.Vide
 
     public boolean checkIsFavorite(int id) {
         ContentResolver contentResolver = this.getContentResolver();
-        Cursor cursor = contentResolver.query(MoviesProvider.FavoriteMovies.withId(new Long(id)),
+        Cursor cursor = contentResolver.query(MovieContract.MovieEntry.buildMovieUriWithid(new Long(id)),
                 null,
                 null,
                 null,
@@ -140,10 +141,10 @@ public class MovieDetail extends AppCompatActivity implements VideosAdapter.Vide
     public void addToFavorite() {
         ContentResolver contentResolver = this.getContentResolver();
         ContentValues cv = new ContentValues();
-        cv.put(MovieColumns.MOVIE_ID, _movie.getId());
-        cv.put(MovieColumns.TITLE, _movie.getTitle());
-        cv.put(MovieColumns.MOVIE_IMG, bitmapToByte());
-        contentResolver.insert(MoviesProvider.FavoriteMovies.MOVIES, cv);
+        cv.put(MovieContract.MovieEntry.MOVIE_ID, _movie.getId());
+        cv.put(MovieContract.MovieEntry.TITLE, _movie.getTitle());
+        cv.put(MovieContract.MovieEntry.MOVIE_IMG, bitmapToByte());
+        contentResolver.insert(MovieContract.MovieEntry.CONTENT_URI, cv);
 
         Toast.makeText(this, getResources().getString(R.string.movies_added), Toast.LENGTH_LONG).show();
         manageFavorite();
@@ -153,7 +154,7 @@ public class MovieDetail extends AppCompatActivity implements VideosAdapter.Vide
     public void removeFromFavorite() {
         int id = _movie.getId();
         ContentResolver contentResolver = this.getContentResolver();
-        contentResolver.delete(MoviesProvider.FavoriteMovies.withId(new Long(id)),
+        contentResolver.delete(MovieContract.MovieEntry.buildMovieUriWithid(new Long(id)),
                 null,
                 null);
 
@@ -352,6 +353,9 @@ public class MovieDetail extends AppCompatActivity implements VideosAdapter.Vide
     @Override
     public void onClick(VideosResult clickedVideo) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + clickedVideo.getKey()));
+        if (intent.resolveActivity(getPackageManager()) == null) {
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + clickedVideo.getKey()));
+        }
         startActivity(intent);
 
     }

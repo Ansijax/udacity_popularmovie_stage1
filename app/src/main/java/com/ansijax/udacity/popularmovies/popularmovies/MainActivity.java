@@ -19,8 +19,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.ansijax.udacity.popularmovies.popularmovies.data.MovieColumns;
-import com.ansijax.udacity.popularmovies.popularmovies.data.MoviesProvider;
+import com.ansijax.udacity.popularmovies.popularmovies.data.MovieContract;
 import com.ansijax.udacity.popularmovies.popularmovies.network.OkHttpRequest;
 import com.ansijax.udacity.popularmovies.popularmovies.pojo.Movie;
 import com.ansijax.udacity.popularmovies.popularmovies.pojo.MovieList;
@@ -72,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
-        callNetwork();
+        if(savedInstanceState ==null)
+            callNetwork();
     }
 
 
@@ -174,6 +174,25 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     }
 
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("data",movies);
+        outState.putInt("query",mQueryType);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+
+        super.onRestoreInstanceState(savedInstanceState);
+        movies= savedInstanceState.getParcelable("data");
+        mQueryType=savedInstanceState.getInt("query");
+       if(movies!=null)
+            mAdapter.setAdapter(movies);
+
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -210,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         return new CursorLoader(this,
-                MoviesProvider.FavoriteMovies.MOVIES,
+                MovieContract.MovieEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -222,9 +241,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         ArrayList<Movie> storedMovieList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Movie movie = new Movie();
-            movie.setImageBinary(cursor.getBlob(cursor.getColumnIndex(MovieColumns.MOVIE_IMG)));
-            movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieColumns.TITLE)));
-            movie.setId(cursor.getInt(cursor.getColumnIndex(MovieColumns.MOVIE_ID)));
+            movie.setImageBinary(cursor.getBlob(cursor.getColumnIndex(MovieContract.MovieEntry.MOVIE_IMG)));
+            movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.TITLE)));
+            movie.setId(cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.MOVIE_ID)));
             storedMovieList.add(movie);
 
         }

@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"
-            android:configChanges="orientation|screenSize"
+
             android:launchMode="singleTop"
             >
             <intent-filter>
@@ -23,7 +23,7 @@
         <activity android:name=".MovieDetail"
             android:parentActivityName=".MainActivity"
             android:label="Movie details"
-            android:configChanges="orientation|screenSize">
+            >
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -33,7 +33,7 @@
 
         <provider
             android:authorities="com.ansijax.udacity.popularmovies.popularmovies.MoviesProvider"
-            android:name="com.ansijax.udacity.popularmovies.popularmovies.provider.MoviesProvider"
+            android:name="com.ansijax.udacity.popularmovies.popularmovies.data.MoviesProvider"
             android:exported="false" />
     </application>
 
